@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -118,23 +119,25 @@ public class Controller implements Initializable {
 		try {
 			Client client = new Client();
 			TreeMap<String, Conversation> xml = Client.ReadFromXMLFriends();
-			for (int i = 0; i < xml.size(); i++) {
-				if (xml.get("[" + friends.get(i) + "].xml")) {
-					ObservableList<VBox> dialog = FXCollections.observableArrayList();
-					Controller.getConvers().put(friends.get(i), dialog);
-					break;
-				}
+			System.out.println("here");
+				for (Map.Entry<String, Conversation> entry : xml.entrySet()) {
+				System.out.println("Im alive");
+					if(entry.getValue().getMsgs().size() == 0) {
+						ObservableList<VBox> dialog = FXCollections.observableArrayList();
+						Controller.getConvers().put(entry.getKey(), dialog);
+						break;
+					}
 				ObservableList<VBox> dialog = FXCollections.observableArrayList();
-				for (int j = 0; j < xml.getConv().getMsgs().size();) {
+				for (int j = 0; j < entry.getValue().getMsgs().size();) {
 					VBox pane = new VBox();
-					String sender = xml.getConv().getMsgs().get(j).getSender();
+					String sender = entry.getValue().getMsgs().get(j).getSender();
 					boolean sameName = false;
 					do {
-						if (j < xml.getConv().getMsgs().size()
-								&& sender.equals(xml.getConv().getMsgs().get(j).getSender())) {
-							Label time = new Label(xml.getConv().getMsgs().get(j).getTime());
+						if (j < entry.getValue().getMsgs().size()
+								&& sender.equals(entry.getValue().getMsgs().get(j).getSender())) {
+							Label time = new Label(entry.getValue().getMsgs().get(j).getTime());
 							time.setStyle("-fx-text-fill: #cccccc;");
-							Label mes = new Label(xml.getConv().getMsgs().get(j).getText());
+							Label mes = new Label(entry.getValue().getMsgs().get(j).getText());
 							if (Client.getName().equals(sender)) {
 								pane.setAlignment(Pos.CENTER_LEFT);
 							} else {
@@ -150,7 +153,7 @@ public class Controller implements Initializable {
 					} while (sameName);
 					dialog.add(pane);
 				}
-				Controller.getConvers().put(friends.get(i), dialog);
+				Controller.getConvers().put(entry.getKey(), dialog);
 			}
 			Conversation.setStyle("-fx-control-inner-background: ddffff;");
 			FriendsList.setItems(Client.getFriends());

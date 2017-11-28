@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.LinkedList;
 
-import application.Client;
+import application.Controller;
 import javafx.application.Platform;
 import mesPackage.*;
 
@@ -31,10 +31,10 @@ public class NewClientThread implements Runnable {
 					Message receive = (Message) inputStream.readObject();
 					LinkedList<String> receivers = receive.getReceivers();
 					receivers.add(receive.getNickName());
-						if (!Client.getConv().containsKey(receivers)) {
-							Client.getConv().put(receivers, new Conversation());
+						if (!Controller.getConv().containsKey(receivers)) {
+							Controller.getConv().put(receivers, new Conversation());
 						}
-						Client.getConv().get(receivers).getMsgs().add(receive);
+						Controller.getConv().get(receivers).getMsgs().add(receive);
 						Platform.runLater(new Runnable() {
 
 					        @Override

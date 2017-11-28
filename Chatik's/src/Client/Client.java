@@ -57,7 +57,7 @@ import mesPackage.TextMsg;
 //
 public class Client {
 	private static String name;
-	private static String IP = "192.168.1.2";
+	private static String IP = "192.168.1.4";
 	private static Socket socket;
 	private static ObjectOutputStream outputStream;
 	private static ObservableList<String> friends = FXCollections.observableArrayList();
@@ -65,9 +65,8 @@ public class Client {
 	public Client() {
 		try {
 			socket = new Socket(IP, Const.PORT);
-			Client.setSocket(socket);
-			Client.setOutputStream((ObjectOutputStream) socket.getOutputStream());
-			Client.getOutputStream().writeObject(Client.getName());
+			outputStream = new ObjectOutputStream( socket.getOutputStream());
+			outputStream.writeObject(Client.getName());
 			new NewClientThread(socket);
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -31,7 +31,7 @@ import javafx.geometry.Pos;
 
 public class Main extends Application {
 	private static boolean authorized;
-	private static String IP = "192.168.1.2";
+	private static String IP = "192.168.1.4";
 
 	public static boolean isAuthorized() {
 		return authorized;
