@@ -36,7 +36,7 @@ public class NewServerThread implements Runnable {
 		try (ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
 			String userName = (String) inputStream.readObject();
 			name = userName;
-			if (Server.getUsersOffline().containsKey(userName) && !Server.getUsersOffline().get(userName).isEmpty()) {
+			if (Server.getUsersOffline().containsKey(userName) && !Server.getUsersOffline().get(userName).isEmpty()) { // Вивід не отриманих повідомлень
 				while (!Server.getUsersOffline().get(userName).isEmpty()) {
 					Message msg = Server.getUsersOffline().get(userName).removeFirst();
 					outStream.writeObject(msg);

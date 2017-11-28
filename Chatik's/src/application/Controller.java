@@ -1,9 +1,5 @@
 package application;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -12,13 +8,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 import java.util.TreeMap;
 
 import Client.Client;
-import SuPackage.Const;
-import SuPackage.MsgXML;
-import SuPackage.NewClientThread;
 import generated.Conversation;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -117,9 +109,8 @@ public class Controller implements Initializable {
 //			e.printStackTrace();
 //		}
 		try {
-			Client client = new Client();
+			Client.InitializeFriends();
 			TreeMap<String, Conversation> xml = Client.ReadFromXMLFriends();
-			System.out.println("here");
 				for (Map.Entry<String, Conversation> entry : xml.entrySet()) {
 				System.out.println("Im alive");
 					if(entry.getValue().getMsgs().size() == 0) {
@@ -178,9 +169,10 @@ public class Controller implements Initializable {
 		String message = MessageField.getText();
 		LinkedList<String> to = new LinkedList<>();
 		String friendName = FriendsList.getSelectionModel().getSelectedItem();
+//		if(friendName != null) Exeption
 		to.add(friendName);
 		Date now = new Date(System.currentTimeMillis());
-		if (Client.SendMessage(friendName, to, message, now)) {
+		if (Client.SendMessage(friendName, to, message, now)) { // first param unused
 			DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 			Label time = new Label(formatter.format(now));
 			time.setStyle("-fx-text-fill: #cccccc;");
