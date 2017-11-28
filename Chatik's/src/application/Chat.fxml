@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Client">
+   <children>
+      <MenuBar fx:id="menuBar" layoutX="3.0" layoutY="2.0" prefHeight="25.0" prefWidth="594.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <TextArea fx:id="MessageField" layoutX="203.0" layoutY="326.0" prefHeight="73.0" prefWidth="350.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="205.0" AnchorPane.rightAnchor="45.0" />
+      <ListView fx:id="FriendsList" editable="true" layoutY="22.0" maxWidth="205.0" prefHeight="330.0" prefWidth="205.0" AnchorPane.bottomAnchor="46.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="24.0" />
+      <Button fx:id="AddNewFriend" layoutX="14.0" layoutY="371.0" mnemonicParsing="false" onAction="#AddNewFriend" prefHeight="25.0" prefWidth="205.0" text="Add new friend" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+      <Button fx:id="Send" layoutX="554.0" layoutY="327.0" mnemonicParsing="false" onAction="#SendMessage" prefHeight="73.0" prefWidth="46.0" text="Send" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <ListView fx:id="Conversation" layoutX="205.0" layoutY="24.0" prefHeight="303.0" prefWidth="396.0" AnchorPane.bottomAnchor="72.0" AnchorPane.leftAnchor="205.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="24.0" />
+      <TextField fx:id="FriendNameField" layoutY="351.0" prefHeight="25.0" prefWidth="205.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="0.0" />
+   </children>
+</AnchorPane>
