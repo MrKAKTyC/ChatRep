@@ -62,8 +62,9 @@ public class Client {
 	private static ObjectOutputStream outputStream;
 	private static ObservableList<String> friends = FXCollections.observableArrayList();
 
-	public Client() {
+	public Client(String name) {
 		try {
+			Client.name = name;
 			socket = new Socket(IP, Const.PORT);
 			outputStream = new ObjectOutputStream( socket.getOutputStream());
 			outputStream.writeObject(Client.getName());
@@ -90,11 +91,15 @@ public class Client {
 	}
 
 	public static boolean InitializeFriends() {
+	
 		try (Scanner scanner = new Scanner(new FileReader("Friends.txt"))) {
+			System.out.println("Friends");
 			scanner.nextLine();
 			while (scanner.hasNext()) {
 				String friend = scanner.nextLine();
+				System.out.println(friend);
 				friends.add(friend);
+				System.out.println("AddFriend");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -160,6 +165,7 @@ public class Client {
 		TreeMap<String, Conversation> result = new TreeMap<>();
 		Conversation dialog;
 		for (int i = 0; i < friends.size(); i++) {
+			System.out.println("1");
 			if (!xml.readFromFile("[" + friends.get(i) + "].xml")) {
 				dialog = new Conversation();
 				result.put(friends.get(i), dialog);
@@ -169,6 +175,7 @@ public class Client {
 				result.put(friends.get(i), dialog);
 			}
 		}
+		System.out.println("SSize" + result.size());
 		return result;
 	}
 

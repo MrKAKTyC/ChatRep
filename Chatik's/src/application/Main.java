@@ -73,6 +73,7 @@ public class Main extends Application {
 					ServerIntf signUpServerIntf = (ServerIntf) Naming.lookup(SignUpURL);
 					resultSignUp = signUpServerIntf.SignIn(login, new String(digest));
 					if (resultSignUp) {
+						new Client(login);
 						Client.setName(login);
 						setAuthorized(true);
 						AnchorPane root = (AnchorPane) FXMLLoader.load(getClass().getResource("Chat.fxml"));
@@ -112,6 +113,7 @@ public class Main extends Application {
 					resultSignUp = signUpServerIntf.SignUp(login, new String(digest));
 					if (resultSignUp) {
 						Client.setName(login);
+						new Client(login);
 						setAuthorized(true);
 						AnchorPane root = (AnchorPane) FXMLLoader.load(getClass().getResource("Chat.fxml"));
 						Scene scene = new Scene(root, 600, 500);
@@ -155,6 +157,11 @@ public class Main extends Application {
 		MsgXML xml = new MsgXML();
 		for (Entry<LinkedList<String>, Conversation> entry : Controller.getConv().entrySet()) {
 			xml.writeToFile(entry.getValue(), entry.getKey() + ".xml");
+		}
+		try {
+			super.stop();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 

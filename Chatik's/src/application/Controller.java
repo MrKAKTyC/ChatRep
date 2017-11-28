@@ -117,9 +117,8 @@ public class Controller implements Initializable {
 //			e.printStackTrace();
 //		}
 		try {
-			Client client = new Client();
+			Client.InitializeFriends();
 			TreeMap<String, Conversation> xml = Client.ReadFromXMLFriends();
-			System.out.println("here");
 				for (Map.Entry<String, Conversation> entry : xml.entrySet()) {
 				System.out.println("Im alive");
 					if(entry.getValue().getMsgs().size() == 0) {
