@@ -28,7 +28,7 @@ public class NewClientThread implements Runnable {
 		try (ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
 			while (socket.isConnected()) {
 				try{
-					Message receive = (Message) inputStream.readObject();
+					final Message receive = (Message) inputStream.readObject();
 					LinkedList<String> receivers = receive.getReceivers();
 					receivers.add(receive.getNickName());
 						if (!Controller.getConv().containsKey(receivers)) {

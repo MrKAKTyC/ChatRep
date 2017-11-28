@@ -1,5 +1,6 @@
 package SuPackage;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,6 +23,7 @@ public class Server {
 	private static Map<String, LinkedList<Message>> usersOffline = new TreeMap<>();
 	private static int ClientCount = 0;
 	private static int MessageCount = 0;
+	private static String DBaseName = "UsersData.txt";
 	
 
 	@SuppressWarnings({ "unchecked", "resource" })
@@ -32,7 +34,13 @@ public class Server {
 		java.rmi.registry.LocateRegistry.createRegistry(1099);
 		try {
 			SignUpServerImpl o = new SignUpServerImpl();
-			ObjectInputStream in = new ObjectInputStream(new FileInputStream("UsersData.txt"));
+			ObjectInputStream in = null;
+			try{
+				in = new ObjectInputStream(new FileInputStream(DBaseName));
+			}catch (IOException e) {
+				new File(DBaseName).createNewFile();
+				in = new ObjectInputStream(new FileInputStream(DBaseName));
+			}
 			o.setUsersData((HashMap<String, String>) in.readObject());
 			Naming.rebind("Server", o);
 		} catch (IOException | ClassNotFoundException e) {

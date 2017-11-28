@@ -2,12 +2,15 @@ package application;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.rmi.ConnectIOException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.Map.Entry;
+
+import javax.swing.JOptionPane;
 
 import Client.Client;
 import Client.ServerIntf;
@@ -42,19 +45,19 @@ public class Main extends Application {
 	}
 
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(final Stage primaryStage) {
 		primaryStage.setTitle("Chatic");
 		VBox vbox = new VBox(10);
 		vbox.setAlignment(Pos.CENTER);
 		Label EnterName = new Label("Enter username");
 		Label EnterPassword = new Label("Enter password");
-		TextField UserNameField = new TextField();
-		PasswordField PasswordField = new PasswordField();
+		final TextField UserNameField = new TextField();
+		final PasswordField PasswordField = new PasswordField();
 		Button SignIn = new Button("Sign In");
 		SignIn.setPrefWidth(300);
 		Button SignUp = new Button("Sign Up");
 		SignUp.setPrefWidth(300);
-		Label CorrectPasswordLength = new Label();
+		final Label CorrectPasswordLength = new Label();
 		vbox.getChildren().addAll(EnterName, UserNameField, EnterPassword, PasswordField, CorrectPasswordLength, SignIn,
 				SignUp);
 		SignIn.setOnAction(new EventHandler<ActionEvent>() {
@@ -71,6 +74,10 @@ public class Main extends Application {
 					byte[] digest = md.digest();
 					String SignUpURL = "rmi://" + IP + "/Server";
 					ServerIntf signUpServerIntf = (ServerIntf) Naming.lookup(SignUpURL);
+//					try {
+//					} catch (ConnectIOException e) {
+//						JOptionPane.showMessageDialog(null, "Сервер не доступний", "Помилка",JOptionPane.ERROR_MESSAGE);
+//					}
 					resultSignUp = signUpServerIntf.SignIn(login, new String(digest));
 					if (resultSignUp) {
 						Client.setName(login);
