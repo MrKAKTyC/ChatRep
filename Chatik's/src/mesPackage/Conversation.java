@@ -1,16 +1,31 @@
 package mesPackage;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 
 public class Conversation {
-    private LinkedList<String> friends;
+    private LinkedList<String> members;
     private String sender;
     private LinkedList<Message> msgs = new LinkedList<>();
-    public LinkedList<String> getFriend() {
-		return friends;
+    public Conversation(LinkedList<String> friends, String sender, LinkedList<Message> msgs) {
+    	this.members =  new LinkedList<>(friends);
+		this.members.add(sender);
+		members.sort(new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				return o1.compareToIgnoreCase(o2);
+			}
+			
+		});
+		this.sender = sender;
+		this.msgs = msgs;
+	}
+	public LinkedList<String> getFriend() {
+		return members;
 	}
 	public void setFriend(LinkedList<String> friends) {
-		this.friends = friends;
+		this.members = friends;
 	}
 	public LinkedList<Message> getMsgs() {
 		if(msgs == null) {

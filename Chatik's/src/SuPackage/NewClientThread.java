@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Comparator;
 import java.util.LinkedList;
 
-import application.Controller;
+import Client.Client;
 import javafx.application.Platform;
 import mesPackage.*;
 
@@ -31,10 +32,25 @@ public class NewClientThread implements Runnable {
 					Message receive = (Message) inputStream.readObject();
 					LinkedList<String> receivers = receive.getReceivers();
 					receivers.add(receive.getNickName());
-						if (!Controller.getConv().containsKey(receivers)) {
-							Controller.getConv().put(receivers, new Conversation());
+					LinkedList<String> f= new LinkedList<>(receivers);
+					f.add(receive.getNickName());
+					f.remove(Client.getName());
+					f.sort(new Comparator<String>() {
+
+						@Override
+						public int compare(String o1, String o2) {
+							return o1.compareToIgnoreCase(o2);
 						}
-						Controller.getConv().get(receivers).getMsgs().add(receive);
+						
+					});
+						if (!Client.getConv().containsKey(receivers.toString())) {
+//							Client.getConv().get(f).getMsgs().add(receive);!!!!!!!!!!!!!!!!!!!!
+						}
+						else {
+							LinkedList<Message> d = new LinkedList<>();
+							d.add(receive);
+//							Client.getConv().put(f, new Conversation(receivers, name, d));!!!!!!!!!!!!!!!!!!!
+						}
 						Platform.runLater(new Runnable() {
 
 					        @Override

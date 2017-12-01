@@ -58,10 +58,12 @@ public class FileMsg extends TextMsg {
 				String message = scanner.nextLine();
 				Date now = new Date(System.currentTimeMillis());
 				FileMsg NewMessage = new FileMsg(file, message, Client.getName(), to, now);
-				if (!Controller.getConv().containsKey(to)) {
-					Controller.getConv().put(to, new Conversation());
+				if (!Client.getConv().containsKey(to)) {
+					LinkedList<Message> d = new LinkedList<>();
+					d.add(NewMessage);
+//					Client.getConv().put(to, new Conversation(to, Client.getName(), d));
 				}
-				Controller.getConv().get(to).getMsgs().add(NewMessage);
+//				Client.getConv().get(to).getMsgs().add(NewMessage);
 				out.writeObject(NewMessage);
 			}
 		} catch (IOException e) {

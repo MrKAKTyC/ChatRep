@@ -8,24 +8,20 @@ import java.net.Socket;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import SuPackage.Const;
 import SuPackage.MsgXML;
 import SuPackage.NewClientThread;
-import application.Controller;
 import generated.Conversation;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.layout.VBox;
-import mesPackage.Message;
 import mesPackage.TextMsg;
 
 //package Client;
@@ -53,14 +49,14 @@ import mesPackage.TextMsg;
 //import mesPackage.Conversation;
 //import mesPackage.FileMsg;
 //import mesPackage.TextMsg;
-//
-//
+
 public class Client {
 	private static String name;
-	private static String IP = "192.168.1.4";
+	private static String IP = "127.0.0.1";
 	private static Socket socket;
 	private static ObjectOutputStream outputStream;
 	private static ObservableList<String> friends = FXCollections.observableArrayList();
+	private static TreeMap<String, generated.Conversation> conv;
 
 	public Client(String name) {
 		try {
@@ -68,58 +64,85 @@ public class Client {
 			socket = new Socket(IP, Const.PORT);
 			outputStream = new ObjectOutputStream( socket.getOutputStream());
 			outputStream.writeObject(Client.getName());
+			conv = new TreeMap<>(new Comparator<String>() {
+
+				@Override
+				public int compare(String o1, String o2) {
+					return o1.compareTo(o2);
+				}
+			});
+			
+//					new Comparator<LinkedList<String>>() {
+//
+//				@Override
+//				public int compare(LinkedList<String> o1, LinkedList<String> o2) {
+//					if(o1 == null||o2 ==null)
+//						return -1;
+//					if(o1.size()!=o2.size())
+//						return -1;
+//					for(int i = 0; i< o1.size();i++) {
+//						if(!o1.get(i).equals(o2.get(i))) {
+//							return -1;
+//						}
+//					}
+//					return 0;
+//				}
+//
+//			});
 			new NewClientThread(socket);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static ObservableList<String> getFriends() {
-		return friends;
-	}
-
-	public static void setFriends(ObservableList<String> friends) {
-		Client.friends = friends;
-	}
-
-	public static Socket getSocket() {
-		return socket;
-	}
-
-	public static void setSocket(Socket socket) {
-		Client.socket = socket;
-	}
-
 	public static boolean InitializeFriends() {
 	
 		try (Scanner scanner = new Scanner(new FileReader("Friends.txt"))) {
-			System.out.println("Friends");
 			scanner.nextLine();
 			while (scanner.hasNext()) {
 				String friend = scanner.nextLine();
-				System.out.println(friend);
-				friends.add(friend);
-				System.out.println("AddFriend");
+				friends.add(friend.substring(1, friend.length()-1));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
+		
 		return true;
 	}
 
-	private static boolean InitializeConversations() {
-
-		return false;
-	}
-
-	public static boolean SendMessage(String receiver, LinkedList<String> to, String message, Date time) {
+	public static boolean SendMessage(LinkedList<String> to, String message, Date time) {
 		Date now = new Date(System.currentTimeMillis());
 		TextMsg NewMessage = new TextMsg(message, name, to, now);
-		if (!Controller.getConv().containsKey(to)) {
-			Controller.getConv().put(to, new mesPackage.Conversation());
+		LinkedList<String> f= new LinkedList<>(to);
+		ArrayList<generated.Message> d = new ArrayList<>();
+		generated.TextMsg mes = new generated.TextMsg();
+		mes.init(NewMessage);
+		d.add(mes);
+		f.sort(new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				return o1.compareTo(o2);
+			}
+			
+		});
+		System.out.println("conv");
+		for (Entry<String, generated.Conversation> entry : Client.getConv().entrySet()) {
+			System.out.print(entry.getKey());
 		}
-		Controller.getConv().get(to).getMsgs().add(NewMessage);
+		System.out.print("f.toString() "+f.toString());
+		if (conv.containsKey(f.toString())) {
+			conv.get(f.toString()).getMsgs().add(mes);
+		}
+		else {
+			Conversation c = new Conversation();
+			c.setFriend(f.toString());
+			c.setMsgs(d);
+			System.out.print(f.toString());
+			conv.put(f.toString(), c);
+			System.out.println("no key");
+		}
 		try {
 			outputStream.writeObject(NewMessage);
 		} catch (IOException e) {
@@ -129,21 +152,6 @@ public class Client {
 		return true;
 	}
 
-	public static String getIP() {
-		return IP;
-	}
-
-	public static void setIP(String iP) {
-		IP = iP;
-	}
-
-	public static ObjectOutputStream getOutputStream() {
-		return outputStream;
-	}
-
-	public static void setOutputStream(ObjectOutputStream outputStream) {
-		Client.outputStream = outputStream;
-	}
 
 	public static boolean AddNewFriend(String friendsName) {
 		String SignUpURL = "rmi://" + IP + "/Server";
@@ -162,21 +170,20 @@ public class Client {
 
 	public static TreeMap<String, Conversation> ReadFromXMLFriends() {
 		MsgXML xml = new MsgXML();
-		TreeMap<String, Conversation> result = new TreeMap<>();
-		Conversation dialog;
 		for (int i = 0; i < friends.size(); i++) {
-			System.out.println("1");
+			System.out.println("readed " +friends.get(i) );
 			if (!xml.readFromFile("[" + friends.get(i) + "].xml")) {
-				dialog = new Conversation();
-				result.put(friends.get(i), dialog);
-				break;
+				Conversation dialog = new Conversation();
+				conv.put("["+friends.get(i)+"]", dialog );
 			} else {
-				dialog = xml.getConv();
-				result.put(friends.get(i), dialog);
+				Conversation dialog = xml.getConv();
+				conv.put("["+friends.get(i)+"]", dialog );
 			}
 		}
-		System.out.println("SSize" + result.size());
-		return result;
+		return conv;
+	}
+	public static TreeMap<String, Conversation> getConv() {
+		return conv;
 	}
 
 	public static String getName() {
@@ -186,6 +193,37 @@ public class Client {
 	public static void setName(String name) {
 		Client.name = name;
 	}
+	public static String getIP() {
+		return IP;
+	}
+	
+	public static void setIP(String iP) {
+		IP = iP;
+	}
+	
+	public static ObjectOutputStream getOutputStream() {
+		return outputStream;
+	}
+	
+	public static void setOutputStream(ObjectOutputStream outputStream) {
+		Client.outputStream = outputStream;
+	}
+	public static ObservableList<String> getFriends() {
+		return friends;
+	}
+
+	public static void setFriends(ObservableList<String> friends) {
+		Client.friends = friends;
+	}
+
+	public static Socket getSocket() {
+		return socket;
+	}
+
+	public static void setSocket(Socket socket) {
+		Client.socket = socket;
+	}
+
 }
 // private static String name;
 // private static boolean authorized;

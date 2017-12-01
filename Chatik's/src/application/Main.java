@@ -6,7 +6,6 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.LinkedList;
 import java.util.Map.Entry;
 
 import Client.Client;
@@ -16,7 +15,6 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
-import mesPackage.Conversation;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -31,8 +29,6 @@ import javafx.geometry.Pos;
 
 public class Main extends Application {
 	private static boolean authorized;
-	private static String IP = "192.168.1.4";
-
 	public static boolean isAuthorized() {
 		return authorized;
 	}
@@ -69,7 +65,7 @@ public class Main extends Application {
 					md = MessageDigest.getInstance("SHA-256");
 					md.update(password.getBytes());
 					byte[] digest = md.digest();
-					String SignUpURL = "rmi://" + IP + "/Server";
+					String SignUpURL = "rmi://" + Client.getIP() + "/Server";
 					ServerIntf signUpServerIntf = (ServerIntf) Naming.lookup(SignUpURL);
 					resultSignUp = signUpServerIntf.SignIn(login, new String(digest));
 					if (resultSignUp) {
@@ -108,7 +104,7 @@ public class Main extends Application {
 					md = MessageDigest.getInstance("SHA-256");
 					md.update(password.getBytes());
 					byte[] digest = md.digest();
-					String SignUpURL = "rmi://" + IP + "/Server";
+					String SignUpURL = "rmi://" + Client.getIP() + "/Server";
 					ServerIntf signUpServerIntf = (ServerIntf) Naming.lookup(SignUpURL);
 					resultSignUp = signUpServerIntf.SignUp(login, new String(digest));
 					if (resultSignUp) {
@@ -147,7 +143,7 @@ public class Main extends Application {
 			fr.println();
 			System.out.println(Client.getFriends().size());
 			for (int i = 0; i < Client.getFriends().size(); i++) {
-				fr.println(Client.getFriends().get(i));
+				fr.println("["+Client.getFriends().get(i)+"]");
 			}
 			fr.close();
 		} catch (IOException e) {
@@ -155,7 +151,7 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 		MsgXML xml = new MsgXML();
-		for (Entry<LinkedList<String>, Conversation> entry : Controller.getConv().entrySet()) {
+		for (Entry<String, generated.Conversation> entry : Client.getConv().entrySet()) {
 			xml.writeToFile(entry.getValue(), entry.getKey() + ".xml");
 		}
 		try {

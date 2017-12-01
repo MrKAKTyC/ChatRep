@@ -1,24 +1,15 @@
 package application;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 import java.util.TreeMap;
 
 import Client.Client;
-import SuPackage.Const;
-import SuPackage.MsgXML;
-import SuPackage.NewClientThread;
 import generated.Conversation;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -42,7 +33,6 @@ import mesPackage.TextMsg;
 
 public class Controller implements Initializable {
 	private static LinkedList<LinkedList<String>> groups;
-	private static TreeMap<LinkedList<String>, mesPackage.Conversation> conv;
 	private static TreeMap<String, ObservableList<VBox>> convers = new TreeMap<String, ObservableList<VBox>>();
 
 	@FXML
@@ -63,96 +53,99 @@ public class Controller implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		TextMsg.setConversation(Conversation);
-//		MsgXML xml = new MsgXML();
-		
-//		try {
-//			for (int i = 0; i < friends.size(); i++) {
-//				if (!xml.readFromFile("[" + friends.get(i) + "].xml")) {
-//					ObservableList<VBox> dialog = FXCollections.observableArrayList();
-//					Controller.getConvers().put(friends.get(i), dialog);
-//					break;
-//				}
-//				ObservableList<VBox> dialog = FXCollections.observableArrayList();
-//				for (int j = 0; j < xml.getConv().getMsgs().size();) {
-//					VBox pane = new VBox();
-//					String sender = xml.getConv().getMsgs().get(j).getSender();
-//					boolean sameName = false;
-//					do {
-//						if (j < xml.getConv().getMsgs().size()
-//								&& sender.equals(xml.getConv().getMsgs().get(j).getSender())) {
-//							Label time = new Label(xml.getConv().getMsgs().get(j).getTime());
-//							time.setStyle("-fx-text-fill: #cccccc;");
-//							Label mes = new Label(xml.getConv().getMsgs().get(j).getText());
-//							if (Client.getName().equals(sender)) {
-//								pane.setAlignment(Pos.CENTER_LEFT);
-//							} else {
-//								pane.setAlignment(Pos.CENTER_RIGHT);
-//							}
-//							pane.getChildren().addAll(mes, time);
-//							j++;
-//							sameName = true;
-//						} else {
-//							sameName = false;
-//						}
-//
-//					} while (sameName);
-//					dialog.add(pane);
-//				}
-//				Controller.getConvers().put(friends.get(i), dialog);
-//			}
-//			Conversation.setStyle("-fx-control-inner-background: ddffff;");
-//			FriendsList.setItems(Client.getFriends());
-//			FriendsList.setStyle("-fx-control-inner-background: e6f3ff;");
-//			MultipleSelectionModel<String> model = FriendsList.getSelectionModel();
-//			model.selectedItemProperty().addListener(new ChangeListener<String>() {
-//
-//				@Override
-//				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-//
-//					Conversation.setItems(Controller.getConvers().get(observable.getValue()));
-//					Conversation.scrollTo(Controller.getConvers().get(observable.getValue()).size() - 1);
-//				}
-//			});
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		// MsgXML xml = new MsgXML();
+
+		// try {
+		// for (int i = 0; i < friends.size(); i++) {
+		// if (!xml.readFromFile("[" + friends.get(i) + "].xml")) {
+		// ObservableList<VBox> dialog = FXCollections.observableArrayList();
+		// Controller.getConvers().put(friends.get(i), dialog);
+		// break;
+		// }
+		// ObservableList<VBox> dialog = FXCollections.observableArrayList();
+		// for (int j = 0; j < xml.getConv().getMsgs().size();) {
+		// VBox pane = new VBox();
+		// String sender = xml.getConv().getMsgs().get(j).getSender();
+		// boolean sameName = false;
+		// do {
+		// if (j < xml.getConv().getMsgs().size()
+		// && sender.equals(xml.getConv().getMsgs().get(j).getSender())) {
+		// Label time = new Label(xml.getConv().getMsgs().get(j).getTime());
+		// time.setStyle("-fx-text-fill: #cccccc;");
+		// Label mes = new Label(xml.getConv().getMsgs().get(j).getText());
+		// if (Client.getName().equals(sender)) {
+		// pane.setAlignment(Pos.CENTER_LEFT);
+		// } else {
+		// pane.setAlignment(Pos.CENTER_RIGHT);
+		// }
+		// pane.getChildren().addAll(mes, time);
+		// j++;
+		// sameName = true;
+		// } else {
+		// sameName = false;
+		// }
+		//
+		// } while (sameName);
+		// dialog.add(pane);
+		// }
+		// Controller.getConvers().put(friends.get(i), dialog);
+		// }
+		// Conversation.setStyle("-fx-control-inner-background: ddffff;");
+		// FriendsList.setItems(Client.getFriends());
+		// FriendsList.setStyle("-fx-control-inner-background: e6f3ff;");
+		// MultipleSelectionModel<String> model = FriendsList.getSelectionModel();
+		// model.selectedItemProperty().addListener(new ChangeListener<String>() {
+		//
+		// @Override
+		// public void changed(ObservableValue<? extends String> observable, String
+		// oldValue, String newValue) {
+		//
+		// Conversation.setItems(Controller.getConvers().get(observable.getValue()));
+		// Conversation.scrollTo(Controller.getConvers().get(observable.getValue()).size()
+		// - 1);
+		// }
+		// });
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
 		try {
 			Client.InitializeFriends();
 			TreeMap<String, Conversation> xml = Client.ReadFromXMLFriends();
-				for (Map.Entry<String, Conversation> entry : xml.entrySet()) {
-				System.out.println("Im alive");
-					if(entry.getValue().getMsgs().size() == 0) {
-						ObservableList<VBox> dialog = FXCollections.observableArrayList();
-						Controller.getConvers().put(entry.getKey(), dialog);
-						break;
-					}
-				ObservableList<VBox> dialog = FXCollections.observableArrayList();
-				for (int j = 0; j < entry.getValue().getMsgs().size();) {
-					VBox pane = new VBox();
-					String sender = entry.getValue().getMsgs().get(j).getSender();
-					boolean sameName = false;
-					do {
-						if (j < entry.getValue().getMsgs().size()
-								&& sender.equals(entry.getValue().getMsgs().get(j).getSender())) {
-							Label time = new Label(entry.getValue().getMsgs().get(j).getTime());
-							time.setStyle("-fx-text-fill: #cccccc;");
-							Label mes = new Label(entry.getValue().getMsgs().get(j).getText());
-							if (Client.getName().equals(sender)) {
-								pane.setAlignment(Pos.CENTER_LEFT);
+			System.out.println("XML SIZE " + xml.size());
+			for (Entry<String, Conversation> entry : xml.entrySet()) {
+				if (entry.getValue().getMsgs().size() == 0) {
+					ObservableList<VBox> dialog = FXCollections.observableArrayList();
+					convers.put(entry.getKey().substring(1, entry.getKey().length()-1), dialog);
+				} else {
+					ObservableList<VBox> dialog = FXCollections.observableArrayList();
+					for (int j = 0; j < entry.getValue().getMsgs().size();) {
+						VBox pane = new VBox();
+						String sender = entry.getValue().getMsgs().get(j).getSender();
+						boolean sameName = false;
+						do {
+							if (j < entry.getValue().getMsgs().size()
+									&& sender.equals(entry.getValue().getMsgs().get(j).getSender())) {
+								Label time = new Label(entry.getValue().getMsgs().get(j).getTime());
+								time.setStyle("-fx-text-fill: #cccccc;");
+								Label mes = new Label(entry.getValue().getMsgs().get(j).getText());
+								if (Client.getName().equals(sender)) {
+									pane.setAlignment(Pos.CENTER_LEFT);
+								} else {
+									pane.setAlignment(Pos.CENTER_RIGHT);
+								}
+								pane.getChildren().addAll(mes, time);
+								j++;
+								sameName = true;
 							} else {
-								pane.setAlignment(Pos.CENTER_RIGHT);
+								sameName = false;
 							}
-							pane.getChildren().addAll(mes, time);
-							j++;
-							sameName = true;
-						} else {
-							sameName = false;
-						}
 
-					} while (sameName);
-					dialog.add(pane);
+						} while (sameName);
+						dialog.add(pane);
+					}
+					System.out.println(entry.getKey().substring(1, entry.getKey().length()-1));
+					convers.put(entry.getKey().substring(1, entry.getKey().length()-1), dialog);
 				}
-				Controller.getConvers().put(entry.getKey(), dialog);
 			}
 			Conversation.setStyle("-fx-control-inner-background: ddffff;");
 			FriendsList.setItems(Client.getFriends());
@@ -164,7 +157,8 @@ public class Controller implements Initializable {
 				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 
 					Conversation.setItems(Controller.getConvers().get(observable.getValue()));
-					Conversation.scrollTo(Controller.getConvers().get(observable.getValue()).size() - 1);
+					if (Controller.getConvers().get(observable.getValue()).size() != 0)
+						Conversation.scrollTo(Controller.getConvers().get(observable.getValue()).size() - 1);
 				}
 			});
 		} catch (Exception e) {
@@ -179,7 +173,7 @@ public class Controller implements Initializable {
 		String friendName = FriendsList.getSelectionModel().getSelectedItem();
 		to.add(friendName);
 		Date now = new Date(System.currentTimeMillis());
-		if (Client.SendMessage(friendName, to, message, now)) {
+		if (Client.SendMessage(to, message, now)) {
 			DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 			Label time = new Label(formatter.format(now));
 			time.setStyle("-fx-text-fill: #cccccc;");
@@ -220,40 +214,6 @@ public class Controller implements Initializable {
 		FriendNameField.setText("");
 	}
 
-	public static TreeMap<LinkedList<String>, mesPackage.Conversation> getConv() {
-		if (conv == null) {
-			conv = new TreeMap<>(new Comparator<LinkedList<String>>() {
-
-				@Override
-				public int compare(LinkedList<String> o1, LinkedList<String> o2) {
-					if (o1.equals(o2)) {
-						return 0;
-					} else {
-						return -1;
-					}
-				}
-
-			});
-		}
-		return conv;
-	}
-
-	// public static boolean isAuthorized() {
-	// return authorized;
-	// }
-	//
-	// public static void setAuthorized(boolean authorized) {
-	// Controller.authorized = authorized;
-	// }
-
-	// public static LinkedList<String> getMyFriends() {
-	// return myFriends;
-	// }
-	//
-	// public static void setMyFriends(LinkedList<String> myFriends) {
-	// Client.myFriends = myFriends;
-	// }
-
 	public static LinkedList<LinkedList<String>> getGroups() {
 		return groups;
 	}
@@ -263,10 +223,14 @@ public class Controller implements Initializable {
 	}
 
 	public static TreeMap<String, ObservableList<VBox>> getConvers() {
+		if(convers==null) {
+			convers = new TreeMap<String, ObservableList<VBox>>();
+		}
 		return convers;
 	}
 
 	public static void setConvers(TreeMap<String, ObservableList<VBox>> convers) {
 		Controller.convers = convers;
 	}
+
 }

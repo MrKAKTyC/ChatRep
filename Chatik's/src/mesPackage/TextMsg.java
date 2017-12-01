@@ -1,12 +1,8 @@
 package mesPackage;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.Scanner;
 
-import Client.Client;
 import application.Controller;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -23,7 +19,10 @@ public class TextMsg extends Message {
 		super(nicName, to, time);
 		this.text = text;
 	}
-
+	public TextMsg(generated.TextMsg msg) {
+		super(msg);
+		this.text = msg.getText();
+	}
 	public String getText() {
 		return text;
 	}
@@ -34,6 +33,10 @@ public class TextMsg extends Message {
 		Label time = new Label(this.getTime());
 		time.setStyle("-fx-text-fill: #cccccc;");
 		Label mes = new Label(message);
+//		if (!Client.getFriends().contains(friendName)) {
+//			Client.AddNewFriend(friendName);
+////			Controller.getConvers()	convers.put(friendsName, dialog);
+//		}
 		if(Controller.getConvers().get(friendName).get(Controller.getConvers().get(friendName).size()-1).getAlignment()==Pos.CENTER_LEFT) {
 			VBox pane = new VBox();
 			pane.setAlignment(Pos.CENTER_RIGHT);

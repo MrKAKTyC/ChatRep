@@ -8,6 +8,8 @@
 
 package generated;
 
+import java.util.LinkedList;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
@@ -40,18 +42,16 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "message", propOrder = {
     "receiver",
     "sender",
-    "time",
-    "to"
+    "time"
 })
 @XmlSeeAlso({
     TextMsg.class
 })
 public abstract class Message {
 
-    protected String receiver;
+    protected LinkedList<String> receiver;
     protected String sender;
     protected String time;
-    protected String to;
 
     /**
      * Gets the value of the receiver property.
@@ -62,7 +62,7 @@ public abstract class Message {
      *     
      */
     public abstract String getText();
-    public String getReceiver() {
+    public LinkedList<String> getReceiver() {
         return receiver;
     }
 
@@ -74,7 +74,7 @@ public abstract class Message {
      *     {@link String }
      *     
      */
-    public void setReceiver(String value) {
+    public void setReceiver(LinkedList<String> value) {
         this.receiver = value;
     }
 
@@ -134,10 +134,6 @@ public abstract class Message {
      *     {@link String }
      *     
      */
-    public String getTo() {
-        return to;
-    }
-
     /**
      * Sets the value of the to property.
      * 
@@ -146,8 +142,5 @@ public abstract class Message {
      *     {@link String }
      *     
      */
-    public void setTo(String value) {
-        this.to = value;
-    }
 
 }

@@ -45,7 +45,11 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class Conversation {
 
-    protected String friend;
+    public void setMsgs(List<Message> msgs) {
+		this.msgs = msgs;
+	}
+
+	protected String friend;
     @XmlElement(nillable = true)
     protected List<Message> msgs;
 

@@ -69,5 +69,11 @@ public class TextMsg
     public void setText(String value) {
         this.text = value;
     }
+    public void init(mesPackage.Message msg) {
+    	this.setReceiver(msg.getReceivers());
+    	this.setSender(msg.getNickName());
+    	this.setText(msg.getText());
+    	this.setTime(msg.getTime());
+    }
 
 }
