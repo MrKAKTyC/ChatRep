@@ -1,4 +1,4 @@
-package SuPackage;
+package serverStatistic;
 
 public class Statistic {
 	private String time;

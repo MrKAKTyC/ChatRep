@@ -1,4 +1,4 @@
-package SuPackage;
+package server;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import mesPackage.Message;
+import serverStatistic.CalculationsThread;
 
 public class Server {
 	private static Map<String, ObjectOutputStream> usersOnline = new TreeMap<>();
@@ -29,9 +30,7 @@ public class Server {
 	@SuppressWarnings({ "unchecked", "resource" })
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-		// System.setProperty("java.rmi.server.hostname","92.113.98.74");
-		// java.rmi.registry.LocateRegistry.getRegistry("92.113.98.74", 1099);
-		java.rmi.registry.LocateRegistry.createRegistry(1099);
+		java.rmi.registry.LocateRegistry.createRegistry(1099);			// RMI staff
 		try {
 			SignUpServerImpl o = new SignUpServerImpl();
 			ObjectInputStream in = null;
@@ -55,13 +54,15 @@ public class Server {
 		Socket clnt;
 		ExecutorService exec = Executors.newFixedThreadPool(10);
 		
-		while (true) {
+		while (true) {								// Accepting clients
 			clnt = servSocket.accept();
 			System.out.println("Clint " + clnt.toString() + " connected");
 			setClientCount(getClientCount() + 1);
 			exec.execute(new NewServerThread(clnt));
 		}
 	}
+	
+	
 	public static void MessageCounter() {
 		setMessageCount(getMessageCount() + 1);
 	}

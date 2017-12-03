@@ -10,11 +10,11 @@ import java.util.Map.Entry;
 
 import Client.Client;
 import Client.ServerIntf;
-import SuPackage.MsgXML;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
+import server.MsgXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;

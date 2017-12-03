@@ -16,13 +16,12 @@ import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import SuPackage.Const;
-import SuPackage.MsgXML;
-import SuPackage.NewClientThread;
 import generated.Conversation;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import mesPackage.TextMsg;
+import server.Const;
+import server.MsgXML;
 
 public class Client {
 	private static String name;
@@ -46,7 +45,7 @@ public class Client {
 				}
 			});
 			
-			new NewClientThread(socket); 	// start new thread
+			new ClientThread(socket); 	// start new thread
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

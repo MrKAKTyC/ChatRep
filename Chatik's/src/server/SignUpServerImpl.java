@@ -1,4 +1,4 @@
-package SuPackage;
+package server;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -76,11 +76,5 @@ public class SignUpServerImpl extends UnicastRemoteObject implements ServerIntf 
 		}
 		return false;
 	}
-
-//	@Override
-//	public boolean setSocket(ServerSocket sS) throws RemoteException {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
 
 }

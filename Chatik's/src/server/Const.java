@@ -1,4 +1,4 @@
-package SuPackage;
+package server;
 
 public class Const {
 	public static final int PORT = 2579;

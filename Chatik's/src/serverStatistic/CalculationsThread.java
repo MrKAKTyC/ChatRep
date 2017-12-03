@@ -1,4 +1,4 @@
-package SuPackage;
+package serverStatistic;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -12,6 +12,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
+
+import server.Server;
 
 //import com.itextpdf.text.Anchor;
 //import com.itextpdf.text.Document;
