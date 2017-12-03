@@ -15,6 +15,13 @@ public class SignUpServerImpl extends UnicastRemoteObject implements ServerIntf 
 	
 	private HashMap<String, String> UsersData;
 	
+	public HashMap<String, String> getUsersData() {
+		if(UsersData==null) {
+			UsersData = new  HashMap<String, String> ();
+		}
+		return UsersData;
+	}
+
 	protected SignUpServerImpl() throws RemoteException {
 	}
 

@@ -19,6 +19,12 @@ public abstract class Message implements Serializable {
 		DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 		this.time = formatter.format(time);
 	}
+	public Message(generated.Message msg) {
+		this.sender = msg.getSender();
+		this.receivers = msg.getReceiver();
+		this.time = msg.getTime();
+	}
+	
 
 	public String getNickName() {
 		return sender;
