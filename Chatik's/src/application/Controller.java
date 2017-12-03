@@ -32,8 +32,9 @@ import javafx.scene.layout.VBox;
 import mesPackage.TextMsg;
 
 public class Controller implements Initializable {
-	private static LinkedList<LinkedList<String>> groups;
+//	private static LinkedList<LinkedList<String>> groups;
 	private static TreeMap<String, ObservableList<VBox>> convers = new TreeMap<String, ObservableList<VBox>>();
+	
 
 	@FXML
 	ListView<VBox> Conversation;
@@ -53,6 +54,7 @@ public class Controller implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		TextMsg.setConversation(Conversation);
+		TextMsg.setFriendsList(FriendsList);
 		// MsgXML xml = new MsgXML();
 
 		// try {
@@ -213,14 +215,16 @@ public class Controller implements Initializable {
 		}
 		FriendNameField.setText("");
 	}
-
-	public static LinkedList<LinkedList<String>> getGroups() {
-		return groups;
+	public void AddNewFriend(String friendsName) {
+			FriendsList.setItems(Client.getFriends());
 	}
-
-	public static void setGroups(LinkedList<LinkedList<String>> groups) {
-		Controller.groups = groups;
-	}
+//	public static LinkedList<LinkedList<String>> getGroups() {
+//		return groups;
+//	}
+//
+//	public static void setGroups(LinkedList<LinkedList<String>> groups) {
+//		Controller.groups = groups;
+//	}
 
 	public static TreeMap<String, ObservableList<VBox>> getConvers() {
 		if(convers==null) {

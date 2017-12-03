@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 import Client.Client;
+import generated.TextMsg;
 import javafx.application.Platform;
 import mesPackage.*;
 
@@ -33,24 +34,32 @@ public class NewClientThread implements Runnable {
 					LinkedList<String> receivers = receive.getReceivers();
 					receivers.add(receive.getNickName());
 					LinkedList<String> f= new LinkedList<>(receivers);
-					f.add(receive.getNickName());
+					System.out.println(f.toString());
 					f.remove(Client.getName());
+					System.out.println(f.toString());
 					f.sort(new Comparator<String>() {
 
 						@Override
 						public int compare(String o1, String o2) {
-							return o1.compareToIgnoreCase(o2);
+							return o1.compareTo(o2);
 						}
 						
 					});
-						if (!Client.getConv().containsKey(receivers.toString())) {
-//							Client.getConv().get(f).getMsgs().add(receive);!!!!!!!!!!!!!!!!!!!!
-						}
-						else {
-							LinkedList<Message> d = new LinkedList<>();
-							d.add(receive);
-//							Client.getConv().put(f, new Conversation(receivers, name, d));!!!!!!!!!!!!!!!!!!!
-						}
+						TextMsg mes = new TextMsg();
+						mes.init(receive);
+//						if (Client.getConv().containsKey(f.toString())) {
+//							Client.getConv().get(f.toString()).getMsgs().add(mes);
+//						}
+//						else {
+//							ArrayList<generated.Message> d = new ArrayList<>();
+//							Conversation c = new Conversation();
+//							c.setFriend(f.toString());
+//							c.setMsgs(d);
+//							d.add(mes);
+//							System.out.print(f.toString());
+//							Client.getConv().put(f.toString(), c);
+//							System.out.println("no key");
+//						}
 						Platform.runLater(new Runnable() {
 
 					        @Override

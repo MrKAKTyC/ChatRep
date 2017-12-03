@@ -62,6 +62,7 @@ public abstract class Message {
      *     
      */
     public abstract String getText();
+    public abstract void init(mesPackage.Message msg);
     public LinkedList<String> getReceiver() {
         return receiver;
     }

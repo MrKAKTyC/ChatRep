@@ -12,7 +12,6 @@ import java.util.Scanner;
 
 import Client.Client;
 import application.Controller;
-import mesPackage.Conversation;;
 public class FileMsg extends TextMsg {
 
 	private static final long serialVersionUID = -3019774361840502748L;
