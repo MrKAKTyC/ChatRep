@@ -47,19 +47,6 @@ public class NewClientThread implements Runnable {
 					});
 						TextMsg mes = new TextMsg();
 						mes.init(receive);
-//						if (Client.getConv().containsKey(f.toString())) {
-//							Client.getConv().get(f.toString()).getMsgs().add(mes);
-//						}
-//						else {
-//							ArrayList<generated.Message> d = new ArrayList<>();
-//							Conversation c = new Conversation();
-//							c.setFriend(f.toString());
-//							c.setMsgs(d);
-//							d.add(mes);
-//							System.out.print(f.toString());
-//							Client.getConv().put(f.toString(), c);
-//							System.out.println("no key");
-//						}
 						Platform.runLater(new Runnable() {
 
 					        @Override

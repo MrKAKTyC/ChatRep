@@ -143,11 +143,10 @@ public class Main extends Application {
 			fr.println();
 			System.out.println(Client.getFriends().size());
 			for (int i = 0; i < Client.getFriends().size(); i++) {
-				fr.println("["+Client.getFriends().get(i)+"]");
+				fr.println("[" + Client.getFriends().get(i) + "]");
 			}
 			fr.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		MsgXML xml = new MsgXML();
@@ -159,6 +158,7 @@ public class Main extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		Client.disconnect();
 	}
 
 	public static void main(String[] args) {
