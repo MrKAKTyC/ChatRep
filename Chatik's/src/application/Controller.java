@@ -126,24 +126,25 @@ public class Controller implements Initializable {
 	public boolean ShowMessage(Message message) {
 		String friendName = message.getNickName();
 		if (!client.getConv().containsKey("[" + friendName + "]")) {
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-			ButtonType buttonTypeYes = new ButtonType("Yes");
-			ButtonType buttonTypeNo = new ButtonType("No");
-			alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
-			Optional<ButtonType> result = alert.showAndWait();
-			if (result.get() == buttonTypeYes) {
-				Conversation c = new Conversation();
-				FriendsList.getItems().add(friendName);
-				client.getFriends().add(friendName);
-				c.setFriend("[" + friendName + "]");
-				ArrayList<generated.Message> d = new ArrayList<>();
-				c.setMsgs(d);
-				client.getConv().put("[" + friendName + "]", c);
-				ObservableList<VBox> dialog = FXCollections.observableArrayList();
-				convers.put(friendName, dialog);
-			} else {
-				return false;
-			}
+//			Alert alert = new Alert(AlertType.CONFIRMATION);
+//			ButtonType buttonTypeYes = new ButtonType("Yes");
+//			ButtonType buttonTypeNo = new ButtonType("No");
+//			alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+//			Optional<ButtonType> result = alert.showAndWait();
+//			if (result.get() == buttonTypeYes) {
+//				Conversation c = new Conversation();
+//				FriendsList.getItems().add(friendName);
+//				client.getFriends().add(friendName);
+//				c.setFriend("[" + friendName + "]");
+//				ArrayList<generated.Message> d = new ArrayList<>();
+//				c.setMsgs(d);
+//				client.getConv().put("[" + friendName + "]", c);
+//				ObservableList<VBox> dialog = FXCollections.observableArrayList();
+//				convers.put(friendName, dialog);
+//			} else {
+//				return false;
+//			}
+			return false;
 		}
 		String messageText = message.getText();
 		Label time = new Label(message.getTime());

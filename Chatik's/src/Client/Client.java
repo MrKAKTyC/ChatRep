@@ -27,7 +27,7 @@ import mesPackage.TextMsg;
 
 public class Client {
 	private String name;
-	private static String IP = "127.0.0.1";
+	private static String IP = "192.168.1.4";
 	private Socket socket;
 	private ObjectOutputStream outputStream;
 	private ObservableList<String> friends = FXCollections.observableArrayList();
