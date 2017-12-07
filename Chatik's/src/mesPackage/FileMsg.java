@@ -52,19 +52,19 @@ public class FileMsg extends TextMsg {
 			String receiverName = scanner.nextLine();
 			LinkedList<String> to = new LinkedList<>();
 			to.add(receiverName);
-			if (Client.getFriends().contains(to)) {
-				System.out.println("Enter you message ->");
-				String message = scanner.nextLine();
-				Date now = new Date(System.currentTimeMillis());
-				FileMsg NewMessage = new FileMsg(file, message, Client.getName(), to, now);
-				if (!Client.getConv().containsKey(to)) {
-					LinkedList<Message> d = new LinkedList<>();
-					d.add(NewMessage);
-//					Client.getConv().put(to, new Conversation(to, Client.getName(), d));
-				}
-//				Client.getConv().get(to).getMsgs().add(NewMessage);
-				out.writeObject(NewMessage);
-			}
+//			if (Client.getFriends().contains(to)) {
+//				System.out.println("Enter you message ->");
+//				String message = scanner.nextLine();
+//				Date now = new Date(System.currentTimeMillis());
+//				FileMsg NewMessage = new FileMsg(file, message, Client.getName(), to, now);
+//				if (!Client.getConv().containsKey(to)) {
+//					LinkedList<Message> d = new LinkedList<>();
+//					d.add(NewMessage);
+////					Client.getConv().put(to, new Conversation(to, Client.getName(), d));
+//				}
+////				Client.getConv().get(to).getMsgs().add(NewMessage);
+//				out.writeObject(NewMessage);
+//			}USEFUL
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

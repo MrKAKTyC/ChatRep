@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -18,52 +20,24 @@ import java.util.Map.Entry;
 
 import SuPackage.Const;
 import SuPackage.MsgXML;
-import SuPackage.NewClientThread;
 import generated.Conversation;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import mesPackage.TextMsg;
 
-//package Client;
-//
-//import java.io.IOException;
-//import java.io.ObjectOutputStream;
-//import java.net.InetAddress;
-//import java.net.MalformedURLException;
-//import java.net.Socket;
-//import java.net.UnknownHostException;
-//import java.rmi.Naming;
-//import java.rmi.NotBoundException;
-//import java.rmi.RemoteException;
-//import java.security.MessageDigest;
-//import java.security.NoSuchAlgorithmException;
-//import java.util.Comparator;
-//import java.util.LinkedList;
-//import java.util.Map.Entry;
-//import java.util.Scanner;
-//import java.util.TreeMap;
-//
-//import SuPackage.Const;
-//import SuPackage.MsgXML;
-//import SuPackage.NewClientThread;
-//import mesPackage.Conversation;
-//import mesPackage.FileMsg;
-//import mesPackage.TextMsg;
-
 public class Client {
-	private static String name;
-	private static String IP = "192.168.1.4";
-	private static Socket socket;
-	private static ObjectOutputStream outputStream;
-	private static ObservableList<String> friends = FXCollections.observableArrayList();
-	private static TreeMap<String, generated.Conversation> conv;
+	private String name;
+	private static String IP = "127.0.0.1";
+	private Socket socket;
+	private ObjectOutputStream outputStream;
+	private ObservableList<String> friends = FXCollections.observableArrayList();
+	private TreeMap<String, generated.Conversation> conv;
 
 	public Client(String name) {
 		try {
-			Client.name = name;
+			this.name = name;
 			socket = new Socket(IP, Const.PORT);
-			outputStream = new ObjectOutputStream( socket.getOutputStream());
-			outputStream.writeObject(Client.getName());
+			outputStream = new ObjectOutputStream(socket.getOutputStream());
 			conv = new TreeMap<>(new Comparator<String>() {
 
 				@Override
@@ -71,50 +45,93 @@ public class Client {
 					return o1.compareTo(o2);
 				}
 			});
-			
-//					new Comparator<LinkedList<String>>() {
-//
-//				@Override
-//				public int compare(LinkedList<String> o1, LinkedList<String> o2) {
-//					if(o1 == null||o2 ==null)
-//						return -1;
-//					if(o1.size()!=o2.size())
-//						return -1;
-//					for(int i = 0; i< o1.size();i++) {
-//						if(!o1.get(i).equals(o2.get(i))) {
-//							return -1;
-//						}
-//					}
-//					return 0;
-//				}
-//
-//			});
-			new NewClientThread(socket);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static boolean InitializeFriends() {
-	
+	public boolean SignUp(String login, String password) {
+
+		boolean resultSignUp = true;
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("SHA-256");
+			md.update(password.getBytes());
+			byte[] digest = md.digest();
+			String SignUpURL = "rmi://" + IP + "/Server";
+			try {
+				ServerIntf signUpServerIntf = (ServerIntf) Naming.lookup(SignUpURL);
+				resultSignUp = signUpServerIntf.SignUp(login, new String(digest));
+				if (resultSignUp) {
+					setName(login);
+					try {
+						outputStream.writeObject(login);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					return true;
+				}
+			} catch (MalformedURLException | RemoteException | NotBoundException e) {
+				System.out.println("Exception");
+				e.printStackTrace();
+			}
+		} catch (NoSuchAlgorithmException e1) {
+		}
+		return false;
+	}
+
+	public boolean SignIn(String login, String password) {
+		boolean resultSignUp = true;
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("SHA-256");
+			md.update(password.getBytes());
+			byte[] digest = md.digest();
+			String SignUpURL = "rmi://" + IP + "/Server";
+			try {
+				ServerIntf signUpServerIntf = (ServerIntf) Naming.lookup(SignUpURL);
+				resultSignUp = signUpServerIntf.SignIn(login, new String(digest));
+				if (resultSignUp) {
+					name = login;
+					try {
+						outputStream.writeObject(login);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					return true;
+				}
+			} catch (MalformedURLException | RemoteException | NotBoundException e) {
+				System.out.println("Exception");
+				e.printStackTrace();
+			}
+
+		} catch (NoSuchAlgorithmException e1) {
+		}
+		return false;
+	}
+
+	public boolean InitializeFriends() {
+
 		try (Scanner scanner = new Scanner(new FileReader("Friends.txt"))) {
 			scanner.nextLine();
 			while (scanner.hasNext()) {
 				String friend = scanner.nextLine();
-				friends.add(friend.substring(1, friend.length()-1));
+				friends.add(friend.substring(1, friend.length() - 1));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
 	}
 
-	public static boolean SendMessage(LinkedList<String> to, String message, Date time) {
+	public boolean SendMessage(LinkedList<String> to, String message, Date time) {
 		Date now = new Date(System.currentTimeMillis());
 		TextMsg NewMessage = new TextMsg(message, name, to, now);
-		LinkedList<String> f= new LinkedList<>(to);
+		LinkedList<String> f = new LinkedList<>(to);
 		ArrayList<generated.Message> d = new ArrayList<>();
 		generated.TextMsg mes = new generated.TextMsg();
 		mes.init(NewMessage);
@@ -125,17 +142,16 @@ public class Client {
 			public int compare(String o1, String o2) {
 				return o1.compareTo(o2);
 			}
-			
+
 		});
 		System.out.println("conv");
-		for (Entry<String, generated.Conversation> entry : Client.getConv().entrySet()) {
+		for (Entry<String, generated.Conversation> entry : conv.entrySet()) {
 			System.out.print(entry.getKey());
 		}
-		System.out.print("f.toString() "+f.toString());
+		System.out.print("f.toString() " + f.toString());
 		if (conv.containsKey(f.toString())) {
 			conv.get(f.toString()).getMsgs().add(mes);
-		}
-		else {
+		} else {
 			Conversation c = new Conversation();
 			c.setFriend(f.toString());
 			c.setMsgs(d);
@@ -152,8 +168,7 @@ public class Client {
 		return true;
 	}
 
-
-	public static boolean AddNewFriend(String friendsName) {
+	public boolean AddNewFriend(String friendsName) {
 		String SignUpURL = "rmi://" + IP + "/Server";
 		boolean isExistNickname = false;
 		try {
@@ -161,67 +176,87 @@ public class Client {
 			isExistNickname = signUpServerIntf.FindFriend(friendsName);
 			if (isExistNickname) {
 				friends.add(friendsName);
+				LinkedList<String> f = new LinkedList<>();
+				f.add(friendsName);
+				Date now = new Date(System.currentTimeMillis());
+				try {
+					outputStream.writeObject(new TextMsg(null, name, f,now));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+			
 		} catch (RemoteException | MalformedURLException | NotBoundException e) {
 			e.printStackTrace();
 		}
 		return isExistNickname;
 	}
 
-	public static TreeMap<String, Conversation> ReadFromXMLFriends() {
+	public TreeMap<String, Conversation> ReadFromXMLFriends() {
 		MsgXML xml = new MsgXML();
 		for (int i = 0; i < friends.size(); i++) {
-			System.out.println("readed " +friends.get(i) );
+			System.out.println("readed " + friends.get(i));
 			if (!xml.readFromFile("[" + friends.get(i) + "].xml")) {
 				Conversation dialog = new Conversation();
-				conv.put("["+friends.get(i)+"]", dialog );
+				conv.put("[" + friends.get(i) + "]", dialog);
 			} else {
 				Conversation dialog = xml.getConv();
-				conv.put("["+friends.get(i)+"]", dialog );
+				conv.put("[" + friends.get(i) + "]", dialog);
 			}
 		}
 		return conv;
 	}
-	public static TreeMap<String, Conversation> getConv() {
+	public void disconnect() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+}
+
+	public TreeMap<String, Conversation> getConv() {
 		return conv;
 	}
 
-	public static String getName() {
+	public String getName() {
 		return name;
 	}
 
-	public static void setName(String name) {
-		Client.name = name;
+	public void setName(String name) {
+		this.name = name;
 	}
-	public static String getIP() {
+
+	public String getIP() {
 		return IP;
 	}
-	
-	public static void setIP(String iP) {
+
+	public void setIP(String iP) {
 		IP = iP;
 	}
-	
-	public static ObjectOutputStream getOutputStream() {
+
+	public ObjectOutputStream getOutputStream() {
 		return outputStream;
 	}
-	
-	public static void setOutputStream(ObjectOutputStream outputStream) {
-		Client.outputStream = outputStream;
+
+	public void setOutputStream(ObjectOutputStream outputStream) {
+		this.outputStream = outputStream;
 	}
-	public static ObservableList<String> getFriends() {
+
+	public ObservableList<String> getFriends() {
 		return friends;
 	}
 
-	public static void setFriends(ObservableList<String> friends) {
-		Client.friends = friends;
+	public void setFriends(ObservableList<String> friends) {
+		this.friends = friends;
 	}
 
-	public static Socket getSocket() {
+	public Socket getSocket() {
 		return socket;
 	}
 
-	public static void setSocket(Socket socket) {
-		Client.socket = socket;
+	public void setSocket(Socket socket) {
+		this.socket = socket;
 	}
 
 }

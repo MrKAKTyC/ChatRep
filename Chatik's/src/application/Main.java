@@ -2,14 +2,9 @@ package application;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map.Entry;
 
 import Client.Client;
-import Client.ServerIntf;
 import SuPackage.MsgXML;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -29,6 +24,16 @@ import javafx.geometry.Pos;
 
 public class Main extends Application {
 	private static boolean authorized;
+	
+	private static Client client;
+	public static Client getClient() {
+		return client;
+	}
+
+	public void setClient(Client client) {
+		Main.client = client;
+	}
+
 	public static boolean isAuthorized() {
 		return authorized;
 	}
@@ -59,31 +64,26 @@ public class Main extends Application {
 			public void handle(ActionEvent event) {
 				String login = UserNameField.getText();
 				String password = PasswordField.getText();
-				boolean resultSignUp = true;
-				MessageDigest md;
-				try {
-					md = MessageDigest.getInstance("SHA-256");
-					md.update(password.getBytes());
-					byte[] digest = md.digest();
-					String SignUpURL = "rmi://" + Client.getIP() + "/Server";
-					ServerIntf signUpServerIntf = (ServerIntf) Naming.lookup(SignUpURL);
-					resultSignUp = signUpServerIntf.SignIn(login, new String(digest));
-					if (resultSignUp) {
-						new Client(login);
-						Client.setName(login);
-						setAuthorized(true);
-						AnchorPane root = (AnchorPane) FXMLLoader.load(getClass().getResource("Chat.fxml"));
-						Scene scene = new Scene(root, 600, 500);
-						scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-						primaryStage.setScene(scene);
-						primaryStage.setTitle("Chatic");
-						primaryStage.show();
+				client = new Client(login);
+					if (client.SignIn(login, password)) {
+						try {
+							AnchorPane root = (AnchorPane) FXMLLoader.load(getClass().getResource("Chat.fxml"));
+							Scene scene = new Scene(root, 600, 500);
+							scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+							primaryStage.setScene(scene);
+							primaryStage.setTitle("Chatic");
+							primaryStage.show();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 
 					}
-				} catch (NotBoundException | IOException | NoSuchAlgorithmException e) {
-					System.out.println("Exception");
-					e.printStackTrace();
-				}
+					else {
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setContentText("Wrong data");
+						alert.showAndWait();
+					}
 			}
 
 		});
@@ -98,37 +98,24 @@ public class Main extends Application {
 					CorrectPasswordLength.setText("Password must be longer");
 					return;
 				}
-				boolean resultSignUp = true;
-				MessageDigest md;
-				try {
-					md = MessageDigest.getInstance("SHA-256");
-					md.update(password.getBytes());
-					byte[] digest = md.digest();
-					String SignUpURL = "rmi://" + Client.getIP() + "/Server";
-					ServerIntf signUpServerIntf = (ServerIntf) Naming.lookup(SignUpURL);
-					resultSignUp = signUpServerIntf.SignUp(login, new String(digest));
-					if (resultSignUp) {
-						Client.setName(login);
-						new Client(login);
-						setAuthorized(true);
-						AnchorPane root = (AnchorPane) FXMLLoader.load(getClass().getResource("Chat.fxml"));
-						Scene scene = new Scene(root, 600, 500);
-						scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-						primaryStage.setScene(scene);
-						primaryStage.setTitle("Chatic");
-						primaryStage.show();
+					client = new Client(login);
+					if (client.SignUp(login, password)) {
+						try {
+							AnchorPane root = (AnchorPane) FXMLLoader.load(getClass().getResource("Chat.fxml"));
+							Scene scene = new Scene(root, 600, 500);
+							scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+							primaryStage.setScene(scene);
+							primaryStage.setTitle("Chatic");
+							primaryStage.show();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					} else {
 						Alert alert = new Alert(AlertType.INFORMATION);
 						alert.setTitle("Data isn't correct");
 						alert.showAndWait();
 					}
-				} catch (NotBoundException | NoSuchAlgorithmException | IOException e) {
-					Alert alert = new Alert(AlertType.INFORMATION);
-					alert.setTitle("There are some problems");
-					alert.showAndWait();
-					System.out.println("Exception");
-					e.printStackTrace();
-				}
 			}
 		});
 		Scene dialogScene = new Scene(vbox, 300, 300);
@@ -141,9 +128,9 @@ public class Main extends Application {
 		try {
 			PrintWriter fr = new PrintWriter("Friends.txt");
 			fr.println();
-			System.out.println(Client.getFriends().size());
-			for (int i = 0; i < Client.getFriends().size(); i++) {
-				fr.println("["+Client.getFriends().get(i)+"]");
+			System.out.println(client.getFriends().size());
+			for (int i = 0; i < client.getFriends().size(); i++) {
+				fr.println("["+client.getFriends().get(i)+"]");
 			}
 			fr.close();
 		} catch (IOException e) {
@@ -151,9 +138,10 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 		MsgXML xml = new MsgXML();
-		for (Entry<String, generated.Conversation> entry : Client.getConv().entrySet()) {
+		for (Entry<String, generated.Conversation> entry : client.getConv().entrySet()) {
 			xml.writeToFile(entry.getValue(), entry.getKey() + ".xml");
 		}
+		client.disconnect();
 		try {
 			super.stop();
 		} catch (Exception e) {
