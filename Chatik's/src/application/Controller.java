@@ -1,5 +1,7 @@
 package application;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -14,6 +16,7 @@ import java.util.TreeMap;
 import Client.Client;
 import SuPackage.NewClientThread;
 import generated.Conversation;
+import generated.TextMsg;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -33,6 +36,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import mesPackage.Message;
 
 public class Controller implements Initializable {
@@ -52,6 +56,8 @@ public class Controller implements Initializable {
 	TextField FriendNameField;
 	@FXML
 	ListView<String> FriendsList;
+	@FXML
+	Button AddFile;
 
 	public static class MessageException extends Exception {
 
@@ -66,7 +72,7 @@ public class Controller implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
 			client.InitializeFriends();
-			new NewClientThread(client.getName(), client.getSocket(), this::ShowMessage,this::Request);
+			new NewClientThread(client.getName(), client.getSocket(), this::ShowMessage, this::Request);
 			TreeMap<String, Conversation> xml = client.ReadFromXMLFriends();
 			System.out.println("XML SIZE " + xml.size());
 			for (Entry<String, Conversation> entry : xml.entrySet()) {
@@ -108,6 +114,11 @@ public class Controller implements Initializable {
 			FriendsList.setItems(client.getFriends());
 			FriendsList.setStyle("-fx-control-inner-background: e6f3ff;");
 			MultipleSelectionModel<String> model = FriendsList.getSelectionModel();
+			model.select(0);
+			if (convers.size() != 0) {
+				Conversation.setItems(convers.get(model.getSelectedItem()));
+				Conversation.scrollTo(convers.get(model.getSelectedItem()).size() - 1);
+			}
 			model.selectedItemProperty().addListener(new ChangeListener<String>() {
 
 				@Override
@@ -122,30 +133,48 @@ public class Controller implements Initializable {
 			e.printStackTrace();
 		}
 	}
+	
+	public void AttachFile(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialDirectory(new File("."));
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Усі файли (*.*)", "*.*"));
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Усі файли (*.*)", "*.*"));
+		fileChooser.setTitle("Choose file");
+		File file = fileChooser.showOpenDialog(null);
+		try {
+			System.out.println(file.getCanonicalPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public boolean ShowMessage(Message message) {
 		String friendName = message.getNickName();
 		if (!client.getConv().containsKey("[" + friendName + "]")) {
-//			Alert alert = new Alert(AlertType.CONFIRMATION);
-//			ButtonType buttonTypeYes = new ButtonType("Yes");
-//			ButtonType buttonTypeNo = new ButtonType("No");
-//			alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
-//			Optional<ButtonType> result = alert.showAndWait();
-//			if (result.get() == buttonTypeYes) {
-//				Conversation c = new Conversation();
-//				FriendsList.getItems().add(friendName);
-//				client.getFriends().add(friendName);
-//				c.setFriend("[" + friendName + "]");
-//				ArrayList<generated.Message> d = new ArrayList<>();
-//				c.setMsgs(d);
-//				client.getConv().put("[" + friendName + "]", c);
-//				ObservableList<VBox> dialog = FXCollections.observableArrayList();
-//				convers.put(friendName, dialog);
-//			} else {
-//				return false;
-//			}
+			// Alert alert = new Alert(AlertType.CONFIRMATION);
+			// ButtonType buttonTypeYes = new ButtonType("Yes");
+			// ButtonType buttonTypeNo = new ButtonType("No");
+			// alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+			// Optional<ButtonType> result = alert.showAndWait();
+			// if (result.get() == buttonTypeYes) {
+			// Conversation c = new Conversation();
+			// FriendsList.getItems().add(friendName);
+			// client.getFriends().add(friendName);
+			// c.setFriend("[" + friendName + "]");
+			// ArrayList<generated.Message> d = new ArrayList<>();
+			// c.setMsgs(d);
+			// client.getConv().put("[" + friendName + "]", c);
+			// ObservableList<VBox> dialog = FXCollections.observableArrayList();
+			// convers.put(friendName, dialog);
+			// } else {
+			// return false;
+			// }
 			return false;
 		}
+		generated.TextMsg msg = new TextMsg();
+		msg.init(message);
+		client.getConv().get("[" + friendName + "]").getMsgs().add(msg);
 		String messageText = message.getText();
 		Label time = new Label(message.getTime());
 		time.setStyle("-fx-text-fill: #cccccc;");
@@ -171,6 +200,8 @@ public class Controller implements Initializable {
 		// Client.getConversation().setItems(Client.getConvers().get(friendName));
 		System.out.println(message.getTime() + " [" + message.getNickName() + "]: " + message.getText());
 		Conversation.setItems(convers.get(friendName));
+		if (convers.get(friendName).size() != 0)
+			Conversation.scrollTo(convers.get(friendName).size() - 1);
 		return false;
 	}
 
@@ -178,7 +209,7 @@ public class Controller implements Initializable {
 	public void SendMessage(ActionEvent event) throws MessageException {
 		String message = MessageField.getText();
 		if (message.equals("")) {
-//			throw new MessageException();
+			// throw new MessageException();
 		} else {
 			LinkedList<String> to = new LinkedList<>();
 			String friendName = FriendsList.getSelectionModel().getSelectedItem();
@@ -212,6 +243,8 @@ public class Controller implements Initializable {
 						}
 					}
 					Conversation.setItems(convers.get(friendName));
+					if (convers.get(friendName).size() != 0)
+						Conversation.scrollTo(convers.get(friendName).size() - 1);
 					MessageField.setText("");
 				}
 			}
@@ -220,11 +253,16 @@ public class Controller implements Initializable {
 
 	@FXML
 	public void AddNewFriend(ActionEvent action) {
-		String friendsName = FriendNameField.getText();
-		if (client.AddNewFriend(friendsName)) {
+		String friendName = FriendNameField.getText();
+		if (client.AddNewFriend(friendName)) {
+			Conversation c = new Conversation();
+			c.setFriend("[" + friendName + "]");
+			ArrayList<generated.Message> d = new ArrayList<>();
+			c.setMsgs(d);
+			client.getConv().put("[" + friendName + "]", c);
 			FriendsList.setItems(client.getFriends());
 			ObservableList<VBox> dialog = FXCollections.observableArrayList();
-			convers.put(friendsName, dialog);
+			convers.put(friendName, dialog);
 		} else {
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setContentText("There is any user with such name");
@@ -232,16 +270,17 @@ public class Controller implements Initializable {
 		}
 		FriendNameField.setText("");
 	}
+
 	public boolean Request(String friendName) {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setContentText("Do you want to add " + friendName +" to yours friends list?");
+		alert.setContentText("Do you want to add " + friendName + " to yours friends list?");
 		ButtonType buttonTypeYes = new ButtonType("Yes");
 		ButtonType buttonTypeNo = new ButtonType("No");
 		alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == buttonTypeYes) {
 			Conversation c = new Conversation();
-//			FriendsList.getItems().add(friendName);
+			// FriendsList.getItems().add(friendName);
 			client.getFriends().add(friendName);
 			c.setFriend("[" + friendName + "]");
 			ArrayList<generated.Message> d = new ArrayList<>();
@@ -249,12 +288,13 @@ public class Controller implements Initializable {
 			client.getConv().put("[" + friendName + "]", c);
 			ObservableList<VBox> dialog = FXCollections.observableArrayList();
 			convers.put(friendName, dialog);
-		}else {
-			
+		} else {
+
 		}
 		return false;
-		
+
 	}
+
 	public boolean setClient(Client client) {
 		this.client = client;
 		return false;

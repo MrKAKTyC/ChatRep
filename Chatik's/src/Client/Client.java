@@ -13,10 +13,16 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.Map.Entry;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingException;
 
 import SuPackage.Const;
 import SuPackage.MsgXML;
@@ -90,19 +96,24 @@ public class Client {
 			byte[] digest = md.digest();
 			String SignUpURL = "rmi://" + IP + "/Server";
 			try {
-				ServerIntf signUpServerIntf = (ServerIntf) Naming.lookup(SignUpURL);
+				Context namingContext = new InitialContext();
+				Enumeration<NameClassPair> e = namingContext.list( "rmi://" + IP + "/");
+				while(e.hasMoreElements()) {
+					System.out.println(e.nextElement().getName());
+				}
+				ServerIntf signUpServerIntf = (ServerIntf) namingContext.lookup(SignUpURL);
 				resultSignUp = signUpServerIntf.SignIn(login, new String(digest));
 				if (resultSignUp) {
 					name = login;
 					try {
 						outputStream.writeObject(login);
-					} catch (IOException e) {
+					} catch (IOException e1) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						e1.printStackTrace();
 					}
 					return true;
 				}
-			} catch (MalformedURLException | RemoteException | NotBoundException e) {
+			} catch ( RemoteException  | NamingException e) {
 				System.out.println("Exception");
 				e.printStackTrace();
 			}
