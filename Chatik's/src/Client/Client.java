@@ -29,11 +29,12 @@ import SuPackage.MsgXML;
 import generated.Conversation;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import mesPackage.FileMsg;
 import mesPackage.TextMsg;
 
 public class Client {
 	private String name;
-	private static String IP = "192.168.1.4";
+	private static String IP = "192.168.1.2";
 	private Socket socket;
 	private ObjectOutputStream outputStream;
 	private ObservableList<String> friends = FXCollections.observableArrayList();
@@ -178,6 +179,48 @@ public class Client {
 		}
 		return true;
 	}
+	
+	// COPPYY AANNDD PPASSTTEE
+	public boolean SendMessage(FileMsg F_Msg) {
+		
+		LinkedList<String> f = new LinkedList<>(F_Msg.getReceivers());
+		ArrayList<generated.Message> d = new ArrayList<>();
+		generated.FileMsg mes = new generated.FileMsg();
+		mes.init(F_Msg);
+		d.add(mes);
+		f.sort(new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				return o1.compareTo(o2);
+			}
+
+		});
+		System.out.println("conv");
+		for (Entry<String, generated.Conversation> entry : conv.entrySet()) {
+			System.out.print(entry.getKey());
+		}
+		System.out.print("f.toString() " + f.toString());
+		if (conv.containsKey(f.toString())) {
+			conv.get(f.toString()).getMsgs().add(mes);
+		} else {
+			Conversation c = new Conversation();
+			c.setFriend(f.toString());
+			c.setMsgs(d);
+			System.out.print(f.toString());
+			conv.put(f.toString(), c);
+			System.out.println("no key");
+		}
+		try {
+			outputStream.writeObject(F_Msg);
+			System.out.println("Sended!!!!!!!!!!!!!!!");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
 
 	public boolean AddNewFriend(String friendsName) {
 		String SignUpURL = "rmi://" + IP + "/Server";

@@ -10,7 +10,7 @@ public class GroupMessage extends FileMsg{
 	private static final long serialVersionUID = -4169763992201772024L;
 
 	public GroupMessage(File content, String text, String sender, LinkedList<String> receiver, Date time, Group group) {
-		super(content, text, sender, receiver, time);
+		super(content, text, receiver, time);
 		this.group = group;
 	}
 

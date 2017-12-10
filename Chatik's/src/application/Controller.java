@@ -37,6 +37,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import mesPackage.FileMsg;
 import mesPackage.Message;
 
 public class Controller implements Initializable {
@@ -144,36 +145,65 @@ public class Controller implements Initializable {
 		try {
 			System.out.println(file.getCanonicalPath());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		String message = MessageField.getText();
+		if (!message.equals("")) {
+			// throw new MessageException();
+		} else {
+			LinkedList<String> to = new LinkedList<>();
+			String friendName = FriendsList.getSelectionModel().getSelectedItem();
+			if (friendName == null) {
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setContentText("Previously, you must add friend");
+				alert.show();
+			} else {
+				to.add(friendName);
+				Date now = new Date(System.currentTimeMillis());
+				
+				FileMsg F_Mes = new FileMsg(file, client.getName(), to, now);
+				if (client.SendMessage(F_Mes)) {
+					DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+					Label time = new Label(formatter.format(now));
+					time.setStyle("-fx-text-fill: #cccccc;");
+					Label mes = new Label(message);
+					if (convers.get(friendName).size() == 0) {
+						VBox pane = new VBox();
+						pane.setAlignment(Pos.CENTER_LEFT);
+						pane.getChildren().addAll(mes, time);
+						convers.get(friendName).add(pane);
+					} else {
+						if (convers.get(friendName).get(convers.get(friendName).size() - 1)
+								.getAlignment() == Pos.CENTER_RIGHT) {
+							VBox pane = new VBox();
+							pane.setAlignment(Pos.CENTER_LEFT);
+							pane.getChildren().addAll(mes, time);
+							convers.get(friendName).add(pane);
+						} else {
+							convers.get(friendName).get(convers.get(friendName).size() - 1).getChildren().addAll(mes,
+									time);
+						}
+					}
+					Conversation.setItems(convers.get(friendName));
+					if (convers.get(friendName).size() != 0)
+						Conversation.scrollTo(convers.get(friendName).size() - 1);
+					MessageField.setText("");
+				}
+			}
+		}
+	
+		
 	}
 
 	public boolean ShowMessage(Message message) {
 		String friendName = message.getNickName();
 		if (!client.getConv().containsKey("[" + friendName + "]")) {
-			// Alert alert = new Alert(AlertType.CONFIRMATION);
-			// ButtonType buttonTypeYes = new ButtonType("Yes");
-			// ButtonType buttonTypeNo = new ButtonType("No");
-			// alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
-			// Optional<ButtonType> result = alert.showAndWait();
-			// if (result.get() == buttonTypeYes) {
-			// Conversation c = new Conversation();
-			// FriendsList.getItems().add(friendName);
-			// client.getFriends().add(friendName);
-			// c.setFriend("[" + friendName + "]");
-			// ArrayList<generated.Message> d = new ArrayList<>();
-			// c.setMsgs(d);
-			// client.getConv().put("[" + friendName + "]", c);
-			// ObservableList<VBox> dialog = FXCollections.observableArrayList();
-			// convers.put(friendName, dialog);
-			// } else {
-			// return false;
-			// }
 			return false;
 		}
 		generated.TextMsg msg = new TextMsg();
 		msg.init(message);
+		
 		client.getConv().get("[" + friendName + "]").getMsgs().add(msg);
 		String messageText = message.getText();
 		Label time = new Label(message.getTime());
