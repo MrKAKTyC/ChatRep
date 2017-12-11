@@ -6,15 +6,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.Scanner;
 import java.util.function.Function;
 
-import Client.Client;
-import application.Controller;
 import javafx.application.Platform;
 
 public class FileMsg extends Message {

@@ -1,5 +1,6 @@
 package SuPackage;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,17 +23,19 @@ public class Server {
 	private static Map<String, LinkedList<Message>> usersOffline = new TreeMap<>();
 	private static int ClientCount = 0;
 	private static int MessageCount = 0;
+	private static String DataBase = "UsersData.bd";
 	
 
 	@SuppressWarnings({ "unchecked", "resource" })
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-		// System.setProperty("java.rmi.server.hostname","92.113.98.74");
-		// java.rmi.registry.LocateRegistry.getRegistry("92.113.98.74", 1099);
 		java.rmi.registry.LocateRegistry.createRegistry(1099);
+		if(!new File(DataBase).exists()){
+			new File(DataBase).createNewFile();
+		}
 		try {
 			SignUpServerImpl o = new SignUpServerImpl();
-			ObjectInputStream in = new ObjectInputStream(new FileInputStream("UsersData.txt"));
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(DataBase));
 			o.setUsersData((HashMap<String, String>) in.readObject());
 			Naming.rebind("Server", o);
 		} catch (IOException | ClassNotFoundException e) {

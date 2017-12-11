@@ -1,5 +1,6 @@
 package Client;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -34,7 +35,7 @@ import mesPackage.TextMsg;
 
 public class Client {
 	private String name;
-	private static String IP = "192.168.1.5";
+	private static String IP = "127.0.0.1";
 	private Socket socket;
 	private ObjectOutputStream outputStream;
 	private ObservableList<String> friends = FXCollections.observableArrayList();
@@ -125,8 +126,10 @@ public class Client {
 	}
 
 	public boolean InitializeFriends() {
+		
+		File friends_file = new File(this.name +" Friends.txt");
 
-		try (Scanner scanner = new Scanner(new FileReader("Friends.txt"))) {
+		try (Scanner scanner = new Scanner(new FileReader(friends_file))) {
 			scanner.nextLine();
 			while (scanner.hasNext()) {
 				String friend = scanner.nextLine();

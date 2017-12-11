@@ -5,7 +5,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.function.Function;
 
 public abstract class Message implements Serializable {
 	private static final long serialVersionUID = 1415402689274157468L;

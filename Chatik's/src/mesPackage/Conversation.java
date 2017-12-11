@@ -7,6 +7,7 @@ public class Conversation {
     private LinkedList<String> members;
     private String sender;
     private LinkedList<Message> msgs = new LinkedList<>();
+    
     public Conversation(LinkedList<String> friends, String sender, LinkedList<Message> msgs) {
     	this.members =  new LinkedList<>(friends);
 		this.members.add(sender);

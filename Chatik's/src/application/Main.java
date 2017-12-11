@@ -126,7 +126,7 @@ public class Main extends Application {
 	@Override
 	public void stop() {
 		try {
-			PrintWriter fr = new PrintWriter("Friends.txt");
+			PrintWriter fr = new PrintWriter(Main.client.getName() + " Friends.txt");
 			fr.println();
 			System.out.println(client.getFriends().size());
 			for (int i = 0; i < client.getFriends().size(); i++) {
@@ -134,7 +134,6 @@ public class Main extends Application {
 			}
 			fr.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		MsgXML xml = new MsgXML();
