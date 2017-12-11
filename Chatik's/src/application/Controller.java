@@ -1,7 +1,6 @@
 package application;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -22,6 +21,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -38,7 +38,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import mesPackage.FileMsg;
-import mesPackage.Message;
 
 public class Controller implements Initializable {
 	private TreeMap<String, ObservableList<VBox>> convers = new TreeMap<String, ObservableList<VBox>>();
@@ -73,9 +72,11 @@ public class Controller implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
 			client.InitializeFriends();
-			new NewClientThread(client.getName(), client.getSocket(), this::ShowMessage, this::Request);
+			new NewClientThread(client.getName(), client.getSocket(), this::Request);
 			TreeMap<String, Conversation> xml = client.ReadFromXMLFriends();
 			System.out.println("XML SIZE " + xml.size());
+			FileMsg.setShowFileMsg(this::ShowFileMessage);
+			mesPackage.TextMsg.setShowTextMsg(this::ShowTextMessage);
 			for (Entry<String, Conversation> entry : xml.entrySet()) {
 				if (entry.getValue().getMsgs().size() == 0) {
 					ObservableList<VBox> dialog = FXCollections.observableArrayList();
@@ -134,7 +135,7 @@ public class Controller implements Initializable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void AttachFile(ActionEvent event) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialDirectory(new File("."));
@@ -142,11 +143,6 @@ public class Controller implements Initializable {
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Усі файли (*.*)", "*.*"));
 		fileChooser.setTitle("Choose file");
 		File file = fileChooser.showOpenDialog(null);
-		try {
-			System.out.println(file.getCanonicalPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 		String message = MessageField.getText();
 		if (!message.equals("")) {
@@ -161,13 +157,23 @@ public class Controller implements Initializable {
 			} else {
 				to.add(friendName);
 				Date now = new Date(System.currentTimeMillis());
-				
+
 				FileMsg F_Mes = new FileMsg(file, client.getName(), to, now);
 				if (client.SendMessage(F_Mes)) {
 					DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 					Label time = new Label(formatter.format(now));
+					/////////////////////////
 					time.setStyle("-fx-text-fill: #cccccc;");
-					Label mes = new Label(message);
+					Button mes = new Button(file.getName());
+					
+					mes.setOnAction(new EventHandler<ActionEvent>() {
+
+						@Override
+						public void handle(ActionEvent event) {
+							F_Mes.Open();
+						}
+					});
+					
 					if (convers.get(friendName).size() == 0) {
 						VBox pane = new VBox();
 						pane.setAlignment(Pos.CENTER_LEFT);
@@ -192,18 +198,18 @@ public class Controller implements Initializable {
 				}
 			}
 		}
-	
-		
+
 	}
 
-	public boolean ShowMessage(Message message) {
+	public boolean ShowTextMessage(mesPackage.TextMsg message) {
+
 		String friendName = message.getNickName();
 		if (!client.getConv().containsKey("[" + friendName + "]")) {
 			return false;
 		}
 		generated.TextMsg msg = new TextMsg();
 		msg.init(message);
-		
+
 		client.getConv().get("[" + friendName + "]").getMsgs().add(msg);
 		String messageText = message.getText();
 		Label time = new Label(message.getTime());
@@ -235,11 +241,53 @@ public class Controller implements Initializable {
 		return false;
 	}
 
+	private boolean ShowFileMessage(FileMsg message) {
+		String friendName = message.getNickName();
+		generated.FileMsg msg = new generated.FileMsg();
+		msg.init(message);
+
+		client.getConv().get("[" + friendName + "]").getMsgs().add(msg);
+		Label time = new Label(message.getTime());
+		time.setStyle("-fx-text-fill: #cccccc;");
+
+		Button butt = new Button(message.getHeader());
+		butt.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				message.Open();
+			}
+		});
+		if (!client.getFriends().contains(friendName)) { // Якщо немаэ такого
+															// друга
+			client.AddNewFriend(friendName);
+			ObservableList<VBox> dialog = FXCollections.observableArrayList();
+			convers.put(friendName, dialog);
+		}
+		if (convers.get(friendName).size() == 0) { // if first message in conv
+			VBox pane = new VBox();
+			pane.setAlignment(Pos.CENTER_LEFT);
+			pane.getChildren().addAll(butt, time);
+			convers.get(friendName).add(pane);
+		} else if (convers.get(friendName).get(convers.get(friendName).size() - 1).getAlignment() == Pos.CENTER_LEFT) {
+			VBox pane = new VBox();
+			pane.setAlignment(Pos.CENTER_RIGHT);
+			pane.getChildren().addAll(butt, time);
+			convers.get(friendName).add(pane);
+		} else {
+			convers.get(friendName).get(convers.get(friendName).size() - 1).getChildren().addAll(butt, time);
+		}
+		System.out.println(message.getTime() + " [" + message.getNickName() + "]: " + message.getText());
+		Conversation.setItems(convers.get(friendName));
+		if (convers.get(friendName).size() != 0)
+			Conversation.scrollTo(convers.get(friendName).size() - 1);
+		return true;
+	}
+
 	@FXML
 	public void SendMessage(ActionEvent event) throws MessageException {
 		String message = MessageField.getText();
 		if (message.equals("")) {
-			// throw new MessageException();
 		} else {
 			LinkedList<String> to = new LinkedList<>();
 			String friendName = FriendsList.getSelectionModel().getSelectedItem();

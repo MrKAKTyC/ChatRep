@@ -2,10 +2,19 @@ package mesPackage;
 
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.function.Function;
+
+import javafx.application.Platform;
 
 public class TextMsg extends Message {
 	private static final long serialVersionUID = 4490283261034661567L;
 	private String text;
+	private static Function<TextMsg, Boolean> ShowTextMsg;
+
+
+	public static void setShowTextMsg(Function<TextMsg, Boolean> showTextMsg) {
+		ShowTextMsg = showTextMsg;
+	}
 
 	public TextMsg(String text, String nicName, LinkedList<String> to, Date time) {
 		super(nicName, to, time);
@@ -23,8 +32,12 @@ public class TextMsg extends Message {
 
 	@Override
 	public void showMessage() {
-		// TODO Auto-generated method stub
-		
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				ShowTextMsg.apply(TextMsg.this);
+			}
+		});
 	}
 
 //	public void showMessage() {
